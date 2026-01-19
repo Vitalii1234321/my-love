@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Особливий квест ❤️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- СТАРТОВИЙ ЕКРАН -->
+  <div id="start-screen" class="screen active">
+    <h1>💌 Особливий квест</h1>
+    <p>Цей квест створений спеціально для тебе</p>
+    <button onclick="startBackgroundMusic(); goToMenu()">Запустити</button>
+  </div>
+
+  <!-- ГОЛОВНЕ МЕНЮ -->
+  <div id="menu-screen" class="screen">
+    <h2>Головне меню</h2>
+    <p class="total-score">Загальні бали: <span id="totalScore">0</span></p>
+    <button onclick="startHeartsGame()">❤️ Лови сердечка</button>
+    <button onclick="startPhraseGame()">🔗 З’єднай фрази</button>
+    <button disabled>🧠 Знайди пари (скоро)</button>
+    <button disabled>🎁 Фінал (пізніше)</button>
+  </div>
+
+  <!-- ГРА: ЛОВИ СЕРДЕЧКА -->
+  <div id="hearts-screen" class="screen">
+    <h2>Лови сердечка 💕</h2>
+    <p>Очки: <span id="score">0</span></p>
+    <p>Час: <span id="time">20</span> сек</p>
+    <div id="game-area"></div>
+  </div>
+
+  <!-- ГРА: З’ЄДНАЙ ФРАЗИ -->
+  <div id="phrases-screen" class="screen">
+    <h2>З’єднай фрази 💞</h2>
+    <p>Перетягни правильні частини фраз</p>
+    <div class="phrases-container">
+      <div id="leftColumn" class="column"></div>
+      <div id="rightColumn" class="column"></div>
+    </div>
+  </div>
+
+  <!-- ЕКРАН ПИТАННЯ -->
+  <div id="question-screen" class="screen">
+    <h2>Питання 💭</h2>
+    <p id="questionText"></p>
+    <input type="text" id="answer" placeholder="Введи відповідь" autocomplete="off">
+    <button onclick="checkAnswer()">Відповісти</button>
+  </div>
+
+  <!-- ПІДКЛЮЧЕННЯ JAVASCRIPT -->
+  <script src="script.js"></script>
+</body>
+</html>
