@@ -1,17 +1,15 @@
+// ===== ЗАГАЛЬНЕ =====
 const screens = document.querySelectorAll('.screen');
 const totalScoreEl = document.getElementById('totalScore');
-const backgroundMusic = new Audio('path/to/your/music.mp3');
 
 let totalScore = 0;
 let currentGame = '';
 
-// Показати екран
 function showScreen(id) {
   screens.forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// Активація головного меню
 function goToMenu() {
   totalScoreEl.textContent = totalScore;
   showScreen('menu-screen');
@@ -30,8 +28,7 @@ const hearts = [
   { emoji: '❤️', value: 1 },
   { emoji: '💖', value: 2 },
   { emoji: '💔', value: -1 },
-  { emoji: '🖤', value: -2 },
-  { emoji: '💘', value: 5 } // Бонусне сердечко
+  { emoji: '🖤', value: -2 }
 ];
 
 function startHeartsGame() {
@@ -43,7 +40,6 @@ function startHeartsGame() {
   gameArea.innerHTML = '';
 
   showScreen('hearts-screen');
-  startBackgroundMusic();
 
   gameTimer = setInterval(() => {
     timeLeft--;
@@ -66,17 +62,7 @@ function spawnHeart() {
   heart.onclick = () => {
     score += data.value;
     scoreEl.textContent = score;
-    heart.classList.add('clicked');
-
-    const clickSound = new Audio('path/to/click-sound.mp3');
-    clickSound.play();
-
-    if (data.value > 0) {
-      heart.style.transform = 'scale(1.2)';
-      setTimeout(() => heart.remove(), 200);
-    } else {
-      heart.remove();
-    }
+    heart.remove();
   };
 
   gameArea.appendChild(heart);
@@ -87,11 +73,96 @@ function endHeartsGame() {
   clearInterval(gameTimer);
   clearInterval(spawnTimer);
   gameArea.innerHTML = '';
-
-  const highestScore = Math.max(score, 0);
-  totalScore += highestScore;
   document.getElementById('questionText').textContent =
-    `Гру закінчено! Ваш рахунок: ${highestScore} балів. Як одним словом називають сильне тепле почуття?`;
+    'Як одним словом називають сильне тепле почуття?';
+  showScreen('question-screen');
+}
+
+// ===== ГРА З’ЄДНАЙ ФРАЗИ =====
+const phrases = [
+  ['Я люблю', 'тебе'],
+  ['Ти моє', 'щастя'],
+  ['Разом з тобою', 'тепло'],
+  ['Моє серце', 'для тебе'],
+  ['Ти робиш мене', 'сильнішим'],
+  ['Я думаю', 'про тебе'],
+  ['Ти моє', 'натхнення'],
+  ['Мені добре', 'з тобою'],
+  ['Ти', 'особлива'],
+  ['Наші зустрічі', 'незабутні'],
+  ['Ти моя', 'радість'],
+  ['Я вдячний', 'тобі'],
+  ['Ти змінюєш', 'мій світ'],
+  ['З тобою', 'спокійно'],
+  ['Я ціную', 'кожну мить']
+];
+
+let matched = 0;
+let phraseScore = 0;
+
+function startPhraseGame() {
+  currentGame = 'phrases';
+  matched = 0;
+  phraseScore = 0;
+
+  const left = document.getElementById('leftColumn');
+  const right = document.getElementById('rightColumn');
+
+  left.innerHTML = '';
+  right.innerHTML = '';
+
+  const shuffledRight = [...phrases].sort(() => Math.random() - 0.5);
+
+  phrases.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'phrase';
+    div.textContent = p[0];
+    div.dataset.id = i;
+    left.appendChild(div);
+  });
+
+  shuffledRight.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'phrase drop-zone';
+    div.textContent = p[1];
+    div.dataset.id = phrases.findIndex(x => x[1] === p[1]);
+    right.appendChild(div);
+  });
+
+  enableDragAndDrop();
+  showScreen('phrases-screen');
+}
+
+function enableDragAndDrop() {
+  let dragged = null;
+
+  document.querySelectorAll('.phrase').forEach(el => {
+    el.draggable = true;
+
+    el.ondragstart = () => dragged = el;
+    el.ondragover = e => e.preventDefault();
+
+    el.ondrop = function () {
+      if (!dragged || !this.classList.contains('drop-zone')) return;
+
+      if (dragged.dataset.id === this.dataset.id) {
+        dragged.classList.add('correct');
+        this.classList.add('correct');
+        dragged.draggable = false;
+        this.draggable = false;
+        matched++;
+        phraseScore += 2;
+
+        if (matched === phrases.length) finishPhraseGame();
+      }
+    };
+  });
+}
+
+function finishPhraseGame() {
+  totalScore += phraseScore;
+  document.getElementById('questionText').textContent =
+    'Як одним словом описати всі ці фрази?';
   showScreen('question-screen');
 }
 
@@ -99,25 +170,12 @@ function endHeartsGame() {
 function checkAnswer() {
   const ans = document.getElementById('answer').value.trim().toLowerCase();
 
-  if (ans) {
-    if (ans === 'любов') {
-      alert('Правильно 💖 Бали зараховані!');
-      document.getElementById('answer').value = '';
-      goToMenu();
-    } else {
-      alert('Спробуй ще 😉');
-    }
+  if (ans === 'любов') {
+    if (currentGame === 'hearts') totalScore += Math.max(score, 0);
+    alert('Правильно 💖 Бали зараховані!');
+    document.getElementById('answer').value = '';
+    goToMenu();
   } else {
-    alert('Будь ласка, введіть відповідь.');
+    alert('Спробуй ще 😉');
   }
-}
-
-// Додати музику
-function startBackgroundMusic() {
-  backgroundMusic.loop = true;
-  backgroundMusic.play();
-}
-
-function stopBackgroundMusic() {
-  backgroundMusic.pause();
 }
